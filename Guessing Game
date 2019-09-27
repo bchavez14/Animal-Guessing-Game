@@ -1,0 +1,89 @@
+import TreePackage.DecisionTreeInterface;
+import TreePackage.DecisionTree;
+import java.util.Scanner;
+
+    public class GuessingGame
+    {
+       Scanner userInput =  new Scanner(System.in);
+
+        private DecisionTreeInterface<String> tree;
+
+        public GuessingGame(String question, String noAnswer, String yesAnswer)
+        {
+            DecisionTree<String> no = new DecisionTree<>(noAnswer);
+            DecisionTree<String> yes = new DecisionTree<>(yesAnswer);
+            tree = new DecisionTree<>(question, no, yes);
+        }
+
+        public void play() {
+
+            String answer;
+
+            //run through tree until current node is a leaf
+            while(!tree.isGuess()) {
+                System.out.println(tree.getRootData());
+                answer = userInput.next();
+                if (answer.equals("yes")) {
+                    tree.advanceToYes();
+                }
+                if (answer.equals("no")) {
+                    tree.advanceToNo();
+                }
+            }
+                //once leaf is reached, display guess and get userInput for answer
+                System.out.println("I guess: " + tree.getCurrentData() + ", am I correct?");
+                answer = userInput.next();
+                if (answer.equals("yes")) {
+                    System.out.println("I win!");
+                }
+                else {
+                    learn();
+                }
+        }
+
+        public void learn() {
+            String nextQuestion;
+            String response;
+            String correctAnswer;
+            String oldAnswer;
+            String travAnswer;
+            String itAnswer;
+            oldAnswer = tree.getCurrentData();
+
+            //get what animal user was thinking of
+            System.out.println("What animal were you thinking of?: ");
+            correctAnswer = userInput.next();
+
+            //get better question for user to get better answer
+            System.out.println("What question should I have asked to get closer to your answer?: ");
+            nextQuestion = userInput.next();
+
+            //set new data for currentnode and reset right and left responses
+            tree.setCurrentData(nextQuestion);
+            tree.setResponses(oldAnswer, correctAnswer);
+
+            //allow option of traversal, either Level or PreOrder
+            System.out.println("Would you like to see the traversal of your game: ");
+            travAnswer = userInput.next();
+
+            if (travAnswer.equals("yes")){
+                System.out.println("Level order or PreOrder (L or P?): ");
+                itAnswer = userInput.next();
+                    if(itAnswer.equals("L")){
+                        System.out.print(tree.getLevelOrderIterator());
+                    }
+                    if(itAnswer.equals("P")){
+                        System.out.println(tree.getPreorderIterator());
+                }
+
+            }
+
+            //allow user to keep playing
+            System.out.println("Would you like to play again?: ");
+            response = userInput.next();
+            if (response == "yes") {
+                tree.resetCurrentNode();
+                play();
+            }
+        }
+    }
